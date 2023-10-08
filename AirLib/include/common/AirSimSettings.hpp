@@ -222,6 +222,12 @@ namespace airlib
             float follow_distance = Utils::nan<float>();
         };
 
+        struct EkfSetting
+        {
+            bool enabled = false;
+            Settings settings;
+        };
+
         struct SensorSetting
         {
             SensorBase::SensorType sensor_type;
@@ -281,6 +287,7 @@ namespace airlib
 
             CameraSettingMap cameras;
             std::map<std::string, std::shared_ptr<SensorSetting>> sensors;
+            std::shared_ptr<EkfSetting> ekf_setting;
 
             RCSettings rc;
 
@@ -418,6 +425,9 @@ namespace airlib
         float speed_unit_factor = 1.0f;
         std::string speed_unit_label = "m\\s";
         std::map<std::string, std::shared_ptr<SensorSetting>> sensor_defaults;
+
+        std::shared_ptr<EkfSetting> ekf_setting;
+
         Vector3r wind = Vector3r::Zero();
         Vector3r ext_force = Vector3r::Zero();
         CameraSettingMap external_cameras;
@@ -455,7 +465,8 @@ namespace airlib
             loadPawnPaths(settings_json, pawn_paths);
             loadOtherSettings(settings_json);
             loadDefaultSensorSettings(simmode_name, settings_json, sensor_defaults);
-            loadVehicleSettings(simmode_name, settings_json, vehicles, sensor_defaults, camera_defaults);
+            loadEkfSettings(settings_json);
+            loadVehicleSettings(simmode_name, settings_json, vehicles, sensor_defaults, camera_defaults, ekf_setting);
             loadExternalCameraSettings(settings_json, external_cameras, camera_defaults);
 
             //this should be done last because it depends on vehicles (and/or their type) we have
@@ -812,7 +823,8 @@ namespace airlib
         static std::unique_ptr<VehicleSetting> createVehicleSetting(const std::string& simmode_name, const Settings& settings_json,
                                                                     const std::string vehicle_name,
                                                                     std::map<std::string, std::shared_ptr<SensorSetting>>& sensor_defaults,
-                                                                    const CameraSetting& camera_defaults)
+                                                                    const CameraSetting& camera_defaults,
+                                                                    std::shared_ptr<EkfSetting> ekf_setting)
         {
             auto vehicle_type = Utils::toLower(settings_json.getString("VehicleType", ""));
 
@@ -857,11 +869,15 @@ namespace airlib
             loadCameraSettings(settings_json, vehicle_setting->cameras, camera_defaults);
             loadSensorSettings(settings_json, "Sensors", vehicle_setting->sensors, sensor_defaults);
 
+            // add ekf setting
+            vehicle_setting->ekf_setting = ekf_setting;
+
             return vehicle_setting;
         }
 
         static void createDefaultVehicle(const std::string& simmode_name, std::map<std::string, std::unique_ptr<VehicleSetting>>& vehicles,
-                                         const std::map<std::string, std::shared_ptr<SensorSetting>>& sensor_defaults)
+                                         const std::map<std::string, std::shared_ptr<SensorSetting>>& sensor_defaults,
+                                         std::shared_ptr<EkfSetting> ekf_setting)
         {
             vehicles.clear();
 
@@ -875,6 +891,10 @@ namespace airlib
                 // currently keyboard is not supported so use rc as default
                 simple_flight_setting->rc.remote_control_id = 0;
                 simple_flight_setting->sensors = sensor_defaults;
+
+                // add ekf setting
+                simple_flight_setting->ekf_setting = ekf_setting;
+
                 vehicles[simple_flight_setting->vehicle_name] = std::move(simple_flight_setting);
             }
             else if (simmode_name == kSimModeTypeCar) {
@@ -899,9 +919,10 @@ namespace airlib
         static void loadVehicleSettings(const std::string& simmode_name, const Settings& settings_json,
                                         std::map<std::string, std::unique_ptr<VehicleSetting>>& vehicles,
                                         std::map<std::string, std::shared_ptr<SensorSetting>>& sensor_defaults,
-                                        const CameraSetting& camera_defaults)
+                                        const CameraSetting& camera_defaults,
+                                        std::shared_ptr<EkfSetting> ekf_setting)
         {
-            createDefaultVehicle(simmode_name, vehicles, sensor_defaults);
+            createDefaultVehicle(simmode_name, vehicles, sensor_defaults, ekf_setting);
 
             msr::airlib::Settings vehicles_child;
             if (settings_json.getChild("Vehicles", vehicles_child)) {
@@ -915,7 +936,7 @@ namespace airlib
                 for (const auto& key : keys) {
                     msr::airlib::Settings child;
                     vehicles_child.getChild(key, child);
-                    vehicles[key] = createVehicleSetting(simmode_name, child, key, sensor_defaults, camera_defaults);
+                    vehicles[key] = createVehicleSetting(simmode_name, child, key, sensor_defaults, camera_defaults, ekf_setting);
                 }
             }
         }
@@ -1364,6 +1385,28 @@ namespace airlib
 
                 if ((present_sensors_bitmask & (1U << type)) == 0)
                     sensors[p.first] = p.second;
+            }
+        }
+
+        static std::shared_ptr<EkfSetting> createEkfSettings(bool enabled)
+        {
+            std::shared_ptr<EkfSetting> ekf_setting;
+
+            ekf_setting = std::shared_ptr<EkfSetting>(new EkfSetting());
+            ekf_setting->enabled = enabled;
+
+            return ekf_setting;
+        }
+
+        // creates and intializes Extended Kalman Filter (ekf) settings from json
+        void loadEkfSettings(const Settings& settings_json)
+        {
+            msr::airlib::Settings child;
+            if (settings_json.getChild("EkfSetting", child)) {
+                auto enabled = child.getBool("Enabled", false);
+                ekf_setting = createEkfSettings(enabled);
+                ekf_setting->enabled = enabled;
+                ekf_setting->settings = child;
             }
         }
 

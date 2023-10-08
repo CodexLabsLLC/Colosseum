@@ -213,6 +213,38 @@ struct KinematicsState
     Axis3r angular_acceleration;
 };
 
+struct SensorMeasurements
+{
+    Axis3r accel;
+    Axis3r gyro;
+
+    Axis3r gps_position;
+    Axis3r gps_velocity;
+
+    TReal baro_altitude;
+
+    Axis3r magnetic_flux;
+};
+
+struct SensorBiases
+{
+    Axis3r accel;
+    Axis3r gyro;
+
+    TReal barometer;
+};
+
+struct EkfKinematicsState
+{
+    Axis3r position;
+    Axis4r orientation;
+    Axis3r angles;
+
+    Axis3r linear_velocity;
+
+    SensorBiases sensor_bias;
+};
+
 enum class VehicleStateType
 {
     Unknown,
@@ -223,6 +255,30 @@ enum class VehicleStateType
     BeingDisarmed,
     Disarmed
 };
+
+// Ekf typedefs
+constexpr int NX = 17;
+constexpr int NU = 6;
+constexpr int NW = 13;
+typedef msr::airlib::VectorMath::Vector17f VectorNXf;
+// typedef msr::airlib::VectorMath::Matrix16x16f MatrixNXxNXf;
+// typedef msr::airlib::VectorMath::Matrix12x12f MatrixNWxNWf;
+// typedef msr::airlib::VectorMath::Matrix16x12f MatrixNXxNWf;
+// typedef msr::airlib::VectorMath::Matrix1x16f Matrix1xNXf;
+// typedef msr::airlib::VectorMath::Matrix16x1f MatrixNXx1f;
+// typedef msr::airlib::VectorMath::Matrix3x16f Matrix3xNXf;
+// typedef msr::airlib::VectorMath::Matrix16x3f MatrixNXx3f;
+// typedef msr::airlib::VectorMath::Matrix6x16f Matrix6xNXf;
+// typedef msr::airlib::VectorMath::Matrix16x6f MatrixNXx6f;
+typedef msr::airlib::VectorMath::Matrix17x17f MatrixNXxNXf;
+typedef msr::airlib::VectorMath::Matrix13x13f MatrixNWxNWf;
+typedef msr::airlib::VectorMath::Matrix17x13f MatrixNXxNWf;
+typedef msr::airlib::VectorMath::Matrix1x17f Matrix1xNXf;
+typedef msr::airlib::VectorMath::Matrix17x1f MatrixNXx1f;
+typedef msr::airlib::VectorMath::Matrix3x17f Matrix3xNXf;
+typedef msr::airlib::VectorMath::Matrix17x3f MatrixNXx3f;
+typedef msr::airlib::VectorMath::Matrix6x17f Matrix6xNXf;
+typedef msr::airlib::VectorMath::Matrix17x6f MatrixNXx6f;
 
 class VehicleState
 {

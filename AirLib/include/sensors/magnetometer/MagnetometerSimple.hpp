@@ -59,8 +59,11 @@ namespace airlib
 
             delay_line_.update();
 
-            if (freq_limiter_.isWaitComplete())
+            if (freq_limiter_.isWaitComplete()) {
                 setOutput(delay_line_.getOutput());
+
+                is_new_ = true;
+            }
         }
         //*** End: UpdatableObject implementation ***//
 
