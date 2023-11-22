@@ -12,6 +12,10 @@
 
   <member_of_group>rosidl_interface_packages</member_of_group>
   
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
+
   <build_depend>geometry_msgs</build_depend>
   <build_depend>image_transport</build_depend>
   <build_depend>message_runtime</build_depend>

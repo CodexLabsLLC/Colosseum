@@ -64,11 +64,11 @@ if [ "$(uname)" == "Darwin" ]; then
     export CXX="$(brew --prefix)/opt/llvm/bin/clang++"
 else
     if $gcc; then
-        export CC="gcc-8"
-        export CXX="g++-8"
+        export CC="gcc-11"
+        export CXX="g++-11"
     else
-        export CC="clang-8"
-        export CXX="clang++-8"
+        export CC="clang-11"
+        export CXX="clang++-11"
     fi
 fi
 
@@ -117,7 +117,7 @@ pushd $build_dir  >/dev/null
 # final linking of the binaries can fail due to a missing libc++abi library
 # (happens on Fedora, see https://bugzilla.redhat.com/show_bug.cgi?id=1332306).
 # So we only build the libraries here for now
-make -j"$(nproc)"
+make -lc++fs -j"$(nproc)"
 popd >/dev/null
 
 mkdir -p AirLib/lib/x64/$folder_name
