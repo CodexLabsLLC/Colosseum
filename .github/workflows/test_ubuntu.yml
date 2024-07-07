@@ -11,19 +11,16 @@ jobs:
         os: [ubuntu-20.04]
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
 
       - name: Setup
         run: ./setup.sh
 
       - name: Build AirLib
         run: ./build.sh
-
-      - name: Unity Build
-        run: |
-          sudo apt-get install libboost-all-dev
-          cd Unity
-          ./build.sh
 
       - name: Build ROS Wrapper
         run: |
