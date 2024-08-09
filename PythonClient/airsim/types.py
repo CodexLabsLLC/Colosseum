@@ -12,7 +12,14 @@ class MsgpackMixin:
         return "<" + type(self).__name__ + "> " + pformat(vars(self), indent=4, width=1)
 
     def to_msgpack(self, *args, **kwargs):
-        return self.__dict__
+        res = []
+        for index, (attr_name, attr_type) in enumerate(self.attribute_order):
+            attr_val = getattr(self, attr_name)
+            if issubclass(attr_type, MsgpackMixin):                
+                res.append(attr_type.to_msgpack(attr_val))
+            else:
+                res.append(attr_val)
+        return res
 
     @classmethod
     def from_msgpack(cls, encoded):
@@ -438,6 +445,7 @@ class ImageResponse(MsgpackMixin):
     image_data_uint8 = np.uint8(0)
     image_data_float = 0.0
     camera_position = Vector3r()
+    camera_name = ''
     camera_orientation = Quaternionr()
     time_stamp = np.uint64(0)
     message = ''
@@ -451,6 +459,7 @@ class ImageResponse(MsgpackMixin):
         ('image_data_uint8', np.ndarray),
         ('image_data_float', float),
         ('camera_position', Vector3r),
+        ('camera_name', str),
         ('camera_orientation', Quaternionr),
         ('time_stamp', np.uint64),
         ('message', str),
