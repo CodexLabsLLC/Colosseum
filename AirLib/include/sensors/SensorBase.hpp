@@ -52,6 +52,16 @@ namespace airlib
             ground_truth_.environment = environment;
         }
 
+        virtual void update() override
+        {
+            is_new_ = false;
+        }
+
+        const bool& checkIfNew() const
+        {
+            return is_new_;
+        }
+
         const GroundTruth& getGroundTruth() const
         {
             return ground_truth_;
@@ -68,6 +78,9 @@ namespace airlib
         //ground truth can be shared between many sensors
         GroundTruth ground_truth_ = { nullptr, nullptr };
         std::string name_ = "";
+
+    protected:
+        bool is_new_ = false;
     };
 }
 } //namespace
