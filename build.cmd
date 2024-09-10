@@ -28,16 +28,16 @@ set buildMode=""
 :loop
 IF NOT "%1"=="" (
     IF "%1"=="--Debug" (
-        set buildMode="Debug"
+        set "buildMode=Debug"
         SHIFT
     ) ELSE IF "%1"=="--Release" (
-        set buildMode="Release"
+        set "buildMode=Release"
         SHIFT
     ) ELSE IF "%1"=="--no-full-poly-car" (
-        set noFullPolyCar="y"
+        set "noFullPolyCar=y"
         SHIFT
     ) ELSE IF "%1"=="--RelWithDebInfo" (
-        set buildMode="RelWithDebInfo"
+        set "buildMode=RelWithDebInfo"
         SHIFT
     ) ELSE (
         echo Unknown command line parameter: %1
