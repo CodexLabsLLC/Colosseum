@@ -31,7 +31,9 @@ class MsgpackMixin:
 
         for index, (attr_name, attr_type) in enumerate(cls.attribute_order):
             value = encoded[index]
-            if issubclass(attr_type, MsgpackMixin):
+            if isinstance(value, list) and value and isinstance(value[0], MsgpackMixin):
+                value = [v.from_msgpack() for v in value]
+            elif issubclass(attr_type, MsgpackMixin):
                 value = attr_type.from_msgpack(value)
             setattr(obj, attr_name, value)
 
@@ -548,7 +550,6 @@ class CarState(MsgpackMixin):
     rpm = 0.0
     maxrpm = 0.0
     handbrake = False
-    collision = CollisionInfo()
     kinematics_estimated = KinematicsState()
     timestamp = np.uint64(0)
 
@@ -558,7 +559,6 @@ class CarState(MsgpackMixin):
         ('rpm', float),
         ('maxrpm', float),
         ('handbrake', bool),
-        ('collision', CollisionInfo),
         ('kinematics_estimated', KinematicsState),
         ('timestamp', np.uint64)
     ]
@@ -581,20 +581,29 @@ class MultirotorState(MsgpackMixin):
         ('gps_location', GeoPoint),
         ('timestamp', np.uint64),
         ('landed_state', int),
-        ('rc_data', RCData),
-        ('ready', bool),
-        ('ready_message', str),
-        ('can_arm', bool)
+        ('rc_data', RCData)
+    ]
+
+
+class RotorParameters(MsgpackMixin):
+    thrust = 0.0
+    torque_scaler = 0.0
+    speed = 0.0
+
+    attribute_order = [
+        ('thrust', float),
+        ('torque_scaler', float),
+        ('speed', float)
     ]
 
 
 class RotorStates(MsgpackMixin):
     timestamp = np.uint64(0)
-    rotors = []
+    rotors: list[RotorParameters] = []
 
     attribute_order = [
-        ('timestamp', np.uint64),
-        ('rotors', list)
+        ('rotors', list[RotorParameters]),
+        ('timestamp', np.uint64)
     ]
 
 

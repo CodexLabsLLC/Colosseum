@@ -91,8 +91,13 @@ public class AirSim : ModuleRules
         PublicIncludePaths.Add(Path.Combine(AirLibPath, "include"));
         PublicIncludePaths.Add(Path.Combine(AirLibPath, "deps", "eigen3"));
         AddOSLibDependencies(Target);
+        
+        CompileMode cmplMode = CompileMode.CppCompileWithRpc;
+        
+        if (Target.Platform == UnrealTargetPlatform.Linux)
+            cmplMode = CompileMode.HeaderOnlyWithRpc;
 
-        SetupCompileMode(CompileMode.CppCompileWithRpc, Target);
+        SetupCompileMode(cmplMode, Target);
     }
 
     private void AddOSLibDependencies(ReadOnlyTargetRules Target)
