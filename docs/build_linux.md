@@ -53,9 +53,9 @@ Finally, you will need an Unreal project that hosts the environment for your veh
 
 Once Colosseum is setup:
 
-- Go to `UnrealEngine` installation folder and start Unreal by running `./Engine/Binaries/Linux/UE4Editor`.
+- Go to `UnrealEngine` installation folder and start Unreal by running `./Engine/Binaries/Linux/UnrealEditor`.
 - When Unreal Engine prompts for opening or creating project, select Browse and choose `Colosseum/Unreal/Environments/BlocksV2` (or your [custom](unreal_custenv.md) Unreal project).
-- Alternatively, the project file can be passed as a commandline argument. For Blocks: `./Engine/Binaries/Linux/UE4Editor <Colosseum_path>/Unreal/Environments/Blocks/BlocksV2.uproject`
+- Alternatively, the project file can be passed as a commandline argument. For Blocks: `./Engine/Binaries/Linux/UnrealEditor <Colosseum_path>/Unreal/Environments/Blocks/BlocksV2.uproject`
 - If you get prompts to convert project, look for More Options or Convert-In-Place option. If you get prompted to build, choose Yes. If you get prompted to disable Colosseum plugin, choose No.
 - After Unreal Editor loads, press Play button.
 
