@@ -10,11 +10,13 @@
 #include "physics/Kinematics.hpp"
 #include "vehicles/multirotor/MultiRotorParams.hpp"
 #include "common/Common.hpp"
+#include "common/EkfStructs.hpp"
 #include "firmware/Firmware.hpp"
 #include "AirSimSimpleFlightBoard.hpp"
 #include "AirSimSimpleFlightCommLink.hpp"
 #include "AirSimSimpleFlightEstimator.hpp"
 #include "AirSimSimpleFlightCommon.hpp"
+#include "AirSimSimpleEkf.hpp"
 #include "physics/PhysicsBody.hpp"
 #include "common/AirSimSettings.hpp"
 
@@ -38,12 +40,14 @@ namespace airlib
             safety_params_.vel_to_breaking_dist = safety_params_.min_breaking_dist = 0;
 
             //create sim implementations of board and commlink
-            board_.reset(new AirSimSimpleFlightBoard(&params_));
+            board_.reset(new AirSimSimpleFlightBoard(&params_, vehicle_params_));
             comm_link_.reset(new AirSimSimpleFlightCommLink());
-            estimator_.reset(new AirSimSimpleFlightEstimator());
+
+            ekf_.reset(new AirSimSimpleEkf(board_.get(), comm_link_.get(), vehicle_setting->ekf_setting.get()));
+            estimator_.reset(new AirSimSimpleFlightEstimator(ekf_.get()));
 
             //create firmware
-            firmware_.reset(new simple_flight::Firmware(&params_, board_.get(), comm_link_.get(), estimator_.get()));
+            firmware_.reset(new simple_flight::Firmware(&params_, board_.get(), comm_link_.get(), estimator_.get(), ekf_.get()));
         }
 
     public: //VehicleApiBase implementation
@@ -114,6 +118,7 @@ namespace airlib
         {
             board_->setGroundTruthKinematics(kinematics);
             estimator_->setGroundTruthKinematics(kinematics, environment);
+            ekf_->setGroundTruthKinematics(kinematics, environment);
         }
         virtual bool setRCData(const RCData& rc_data) override
         {
@@ -386,6 +391,45 @@ namespace airlib
 
         //*** End: MultirotorApiBase implementation ***//
 
+    public: // additional interface for ekf data recording
+        // Ground Truth quantities
+        Kinematics::State getTrueKinematicsEstimated() const
+        {
+            return AirSimSimpleFlightCommon::toKinematicsState3r(firmware_->offboardApi().getStateEstimator().getTrueKinematicsEstimated());
+        }
+
+        Vector3r getTrueAngles() const
+        {
+            const auto& val = firmware_->offboardApi().getStateEstimator().getTrueAngles();
+            return AirSimSimpleFlightCommon::toVector3r(val);
+        }
+
+        SensorMeasurements getTrueMeasurements() const
+        {
+            return AirSimSimpleFlightCommon::toSensorMeasurements(firmware_->offboardApi().getStateEstimator().getTrueMeasurements());
+        }
+
+        // Estimated quantities
+        EkfKinematicsState getEkfKinematicsEstimated() const
+        {
+            return AirSimSimpleFlightCommon::toEkfKinematicsState(firmware_->offboardApi().getStateEstimator().getEkfKinematicsEstimated());
+        }
+
+        SensorMeasurements getEkfMeasurements() const
+        {
+            return AirSimSimpleFlightCommon::toSensorMeasurements(firmware_->offboardApi().getStateEstimator().getEkfMeasurements());
+        }
+
+        EkfKinematicsState getEkfStateVariance() const
+        {
+            return AirSimSimpleFlightCommon::toEkfKinematicsState(firmware_->offboardApi().getStateEstimator().getEkfStateVariance());
+        }
+
+        float getEkfOrientationNorm() const
+        {
+            return firmware_->offboardApi().getStateEstimator().getEkfOrientationNorm();
+        }
+
     private:
         //convert pitch, roll, yaw from -1 to 1 to PWM
         static uint16_t angleToPwm(float angle)
@@ -421,6 +465,7 @@ namespace airlib
         unique_ptr<AirSimSimpleFlightCommLink> comm_link_;
         unique_ptr<AirSimSimpleFlightEstimator> estimator_;
         unique_ptr<simple_flight::IFirmware> firmware_;
+        unique_ptr<AirSimSimpleEkf> ekf_;
 
         MultirotorApiParams safety_params_;
 
