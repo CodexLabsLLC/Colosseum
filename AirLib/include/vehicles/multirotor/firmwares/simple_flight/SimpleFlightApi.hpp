@@ -46,6 +46,8 @@ namespace airlib
             firmware_.reset(new simple_flight::Firmware(&params_, board_.get(), comm_link_.get(), estimator_.get()));
         }
 
+        virtual ~SimpleFlightApi();
+
     public: //VehicleApiBase implementation
         virtual void resetImplementation() override
         {

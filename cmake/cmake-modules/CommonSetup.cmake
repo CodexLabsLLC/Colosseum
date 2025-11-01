@@ -65,7 +65,12 @@ macro(CommonSetup)
             endif ()
         endif ()
 
-        set(BUILD_PLATFORM "x64")
+        if (APPLE)
+            set(BUILD_PLATFORM "arm64")
+        else ()
+            set(BUILD_PLATFORM "x64")
+        endif()
+
         set(CMAKE_POSITION_INDEPENDENT_CODE ON)
         if (CMAKE_BUILD_TYPE MATCHES Release)
             set(CMAKE_CXX_FLAGS "-O3 ${CMAKE_CXX_FLAGS}")

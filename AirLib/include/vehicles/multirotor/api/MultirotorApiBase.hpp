@@ -81,7 +81,7 @@ namespace airlib
         virtual void resetImplementation() override;
 
     public: //these APIs uses above low level APIs
-        virtual ~MultirotorApiBase() = default;
+        virtual ~MultirotorApiBase();
 
         /************************* high level move APIs *********************************/
         //return value of these function is true if command was completed without interruption or timeouts

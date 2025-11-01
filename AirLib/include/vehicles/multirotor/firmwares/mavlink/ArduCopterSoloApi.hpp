@@ -13,10 +13,7 @@ namespace airlib
     class ArduCopterSoloApi : public MavLinkMultirotorApi
     {
     public:
-        virtual ~ArduCopterSoloApi()
-        {
-            closeAllConnection();
-        }
+        virtual ~ArduCopterSoloApi();
 
         virtual void update()
         {

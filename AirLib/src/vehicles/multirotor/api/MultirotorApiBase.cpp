@@ -15,6 +15,11 @@ namespace msr
 {
 namespace airlib
 {
+    MultirotorApiBase::~MultirotorApiBase()
+    {
+        //no default action
+        //derived classes should override this method to do cleanup
+    }
 
     void MultirotorApiBase::resetImplementation()
     {

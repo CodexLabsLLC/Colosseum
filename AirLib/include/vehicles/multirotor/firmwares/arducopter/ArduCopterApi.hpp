@@ -42,10 +42,8 @@ namespace airlib
             connect(); // Should we try catching exceptions here?
         }
 
-        ~ArduCopterApi()
-        {
-            closeConnections();
-        }
+        virtual ~ArduCopterApi();
+      
 
     public:
         virtual void resetImplementation() override

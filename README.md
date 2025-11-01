@@ -16,7 +16,7 @@ Moving forward, we are now using Unreal Engine 5 version 5.03 or greater! If you
 want to use UE4.27, you can use the branch `ue4.27`.
   
 ## Unreal Engine Version for Main Branch
-The main branch of this repository **only** supports Unreal Engine 5.2! Please see our other branches
+The main branch of this repository **only** supports Unreal Engine 5.6! Please see our other branches
 for other versions that we support.
   
 ## Currently Supported Operating Systems

@@ -134,7 +134,24 @@ public class AirSim : ModuleRules
 
     private bool AddLibDependency(string LibName, string LibPath, string LibFileName, ReadOnlyTargetRules Target, bool IsAddLibInclude)
     {
-        string PlatformString = (Target.Platform == UnrealTargetPlatform.Win64 || Target.Platform == UnrealTargetPlatform.Mac) ? "x64" : "x86";
+        string PlatformString;
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            PlatformString = "x64";
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Linux)
+        {
+            PlatformString = "x86";
+        }
+        else if (Target.Platform == UnrealTargetPlatform.Mac)
+        {
+            PlatformString = "arm64";
+        }
+        else
+        {
+            throw new System.Exception("Unsupported platform for AirLib dependency: " + Target.Platform);
+        }
+
         string ConfigurationString = (Target.Configuration == UnrealTargetConfiguration.Debug) ? "Debug" : "Release";
         bool isLibrarySupported = false;
 

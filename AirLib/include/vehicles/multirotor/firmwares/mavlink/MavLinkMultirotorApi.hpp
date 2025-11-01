@@ -46,16 +46,7 @@ namespace airlib
     class MavLinkMultirotorApi : public MultirotorApiBase
     {
     public: //methods
-        virtual ~MavLinkMultirotorApi()
-        {
-            closeAllConnection();
-            if (this->connect_thread_.joinable()) {
-                this->connect_thread_.join();
-            }
-            if (this->telemetry_thread_.joinable()) {
-                this->telemetry_thread_.join();
-            }
-        }
+        virtual ~MavLinkMultirotorApi();
 
         //non-base interface specific to MavLinKDroneController
         void initialize(const AirSimSettings::MavLinkConnectionInfo& connection_info, const SensorCollection* sensors, bool is_simulation)

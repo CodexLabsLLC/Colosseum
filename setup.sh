@@ -41,7 +41,7 @@ if [ "$(uname)" == "Darwin" ]; then # osx
     brew update
     # Update below line for newer versions
     #brew install llvm@8
-    brew install llvm
+    brew install llvm@17
 else #linux
     sudo apt-get update
     sudo apt-get -y install --no-install-recommends \
