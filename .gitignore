@@ -331,6 +331,7 @@ cmake_build/
 /3.3.2.zip
 /PythonClient/**/cloud.txt
 /PythonClient/**/cloud.asc
+/Unreal/Environments/BlocksV2/BlocksV2.sln
 /Unreal/Plugins/AirSim/Content/VehicleAdv/SUV/
 /suv_download_tmp
 car_assets.zip
