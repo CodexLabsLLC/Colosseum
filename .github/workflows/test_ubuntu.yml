@@ -8,7 +8,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-20.04]
+        os: [ubuntu-22.04, ubuntu-24.04]
 
     steps:
       - uses: actions/checkout@v3
@@ -24,23 +24,13 @@ jobs:
           ./tools/install_ros_deps.sh
           source /opt/ros/*/setup.bash
           cd ros
-          catkin build -DCMAKE_C_COMPILER=gcc-8 -DCMAKE_CXX_COMPILER=g++-8
+          catkin build -DCMAKE_C_COMPILER=gcc-11 -DCMAKE_CXX_COMPILER=g++-11
       
       - name: Build ROS2 Wrapper
-        if: matrix.os == 'ubuntu-20.04'
+        if: matrix.os == 'ubuntu-22.04'
         run: |
           chmod +x ./tools/install_ros2_deps.sh
           ./tools/install_ros2_deps.sh
           source /opt/ros/*/setup.bash
           cd ros2
-          colcon build --cmake-args -DCMAKE_C_COMPILER=gcc-8 --cmake-args -DCMAKE_CXX_COMPILER=g++-8
-
-      # Removing support for GazeboDrone. Gazebo is dead. Long live AirSim/Colosseum.
-      # - name: Build GazeboDrone
-      #   run: |
-      #     sudo apt-get install -qq libgazebo9-dev gcc-12 g++-12
-      #     ./clean.sh && ./build.sh --gcc
-      #     cd GazeboDrone
-      #     mkdir build && cd build
-      #     cmake -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12 ..
-      #     make
+          colcon build --cmake-args -DCMAKE_C_COMPILER=gcc-11 --cmake-args -DCMAKE_CXX_COMPILER=g++-11
