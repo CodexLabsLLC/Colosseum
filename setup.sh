@@ -108,17 +108,29 @@ else #linux
         # in ubuntu 18 docker CI, avoid building cmake from scratch to save time
         # ref: https://apt.kitware.com/
         ubuntu_version="$(lsb_release -rs)"
-        if [[ "$ubuntu_version" == "22.04" || "$ubuntu_version" == "24.04" ]]; then
+        
+        if [[ "$ubuntu_version" == "22.04" ]]; then
             sudo apt-get -y install \
                 apt-transport-https \
                 ca-certificates \
                 gnupg
             wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-            sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-            sudo apt-get -y install --no-install-recommends \
+            sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ jammy main"
+            sudo apt update && apt-get -y install --no-install-recommends \
                 make \
-                cmake
-
+                cmake \
+                openssl
+        elif [[ "$ubuntu_version" == "24.04" ]]; then
+            sudo apt-get -y install \
+                apt-transport-https \
+                ca-certificates \
+                gnupg
+            wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+            sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ noble main"
+            sudo apt update && apt-get -y install --no-install-recommends \
+                make \
+                cmake \
+                openssl
         else
             # For anything else, build CMake 3.10.2 from source
             if [[ ! -d "cmake_build/bin" ]]; then
