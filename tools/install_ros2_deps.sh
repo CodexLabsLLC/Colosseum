@@ -5,10 +5,13 @@
 set -x
 
 DISTRO="$(lsb_release -sc)"
-if [[ "$DISTRO" == "focal" ]]; then
-    ROS_DISTRO="galactic"
+if [[ "$DISTRO" == "jammy" ]]; then
+    ROS_DISTRO="humble"
+
+elif [[ "$DISTRO" == "noble" ]]; then
+    ROS_DISTRO="kilted"
 else
-    echo "ROS2 support only ubuntu focal"
+    echo "ROS2 support only ubuntu jammy (22.04) and noble (24.04) at the moment."
     exit 1
 fi
 

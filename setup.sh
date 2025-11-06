@@ -7,7 +7,7 @@ pushd "$SCRIPT_DIR" >/dev/null
 
 downloadHighPolySuv=true
 
-MIN_CMAKE_VERSION=3.10.0
+MIN_CMAKE_VERSION=3.19.2
 # On macOS, make sure we have a CMake that will support CMAKE_APPLE_SILICON_PROCESSOR.
 if [ "$(uname)" == "Darwin" ]; then
     MIN_CMAKE_VERSION=3.19.2
@@ -50,7 +50,7 @@ else #linux
         software-properties-common \
         wget \
         libvulkan1 \
-        vulkan-utils
+        vulkan-tools
 
     #install clang and build tools
     VERSION=$(lsb_release -rs | cut -d. -f1)
@@ -60,7 +60,11 @@ else #linux
         wget -O - http://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
         sudo apt-get update
     fi
-    sudo apt-get install -y clang-12 clang++-12 libc++-12-dev libc++abi-12-dev
+    if [  "$VERSION" == "22"  ]; then
+        sudo apt-get install -y clang-14 clang++-14 libc++-14-dev libc++abi-14-dev
+    else    
+        sudo apt-get install -y clang-17 clang++-17 libc++-17-dev libc++abi-17-dev
+    fi
 fi
 
 if ! which cmake; then
@@ -103,22 +107,35 @@ else #linux
     if version_less_than_equal_to "$cmake_ver" "$MIN_CMAKE_VERSION"; then
         # in ubuntu 18 docker CI, avoid building cmake from scratch to save time
         # ref: https://apt.kitware.com/
-        if [ "$(lsb_release -rs)" == "18.04" ]; then
+        ubuntu_version="$(lsb_release -rs)"
+        
+        if [[ "$ubuntu_version" == "22.04" ]]; then
             sudo apt-get -y install \
                 apt-transport-https \
                 ca-certificates \
                 gnupg
             wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
-            sudo apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'
-            sudo apt-get -y install --no-install-recommends \
+            sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ jammy main"
+            sudo apt update && apt-get -y install --no-install-recommends \
                 make \
-                cmake
-
+                cmake \
+                openssl
+        elif [[ "$ubuntu_version" == "24.04" ]]; then
+            sudo apt-get -y install \
+                apt-transport-https \
+                ca-certificates \
+                gnupg
+            wget -O - https://apt.kitware.com/keys/kitware-archive-latest.asc 2>/dev/null | gpg --dearmor - | sudo tee /etc/apt/trusted.gpg.d/kitware.gpg >/dev/null
+            sudo apt-add-repository "deb https://apt.kitware.com/ubuntu/ noble main"
+            sudo apt update && apt-get -y install --no-install-recommends \
+                make \
+                cmake \
+                openssl
         else
-            # For Ubuntu 16.04, or anything else, build CMake 3.10.2 from source
+            # For anything else, build CMake 3.10.2 from source
             if [[ ! -d "cmake_build/bin" ]]; then
                 echo "Downloading cmake..."
-                wget https://cmake.org/files/v3.10/cmake-3.10.2.tar.gz \
+                wget https://cmake.org/files/v3.28/cmake-3.28.4.tar.gz \
                     -O cmake.tar.gz
                 tar -xzf cmake.tar.gz
                 rm cmake.tar.gz
@@ -201,5 +218,5 @@ popd >/dev/null
 set +x
 echo ""
 echo "************************************"
-echo "AirSim setup completed successfully!"
+echo "Colosseum setup completed successfully!"
 echo "************************************"

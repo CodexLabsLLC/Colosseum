@@ -8,7 +8,7 @@ build_dir=build
 mkdir -p build
 cd build
 
-CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 cmake ../cmake -DCMAKE_CXX_FLAGS='-stdlib=libc++ -I/usr/lib/llvm-17/include/c++/v1~'
+CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake ../cmake -DCMAKE_CXX_FLAGS='-stdlib=libc++'
 
 make -j$(nproc)
 
