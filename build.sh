@@ -10,11 +10,21 @@ cd build
 
 # Check if we are on Mac using the DARWIN environment variable
 if [[ "$(uname)" == "Darwin" ]]; then
-    echo "Building for MacOS"
+
+    # Fix for Unreal/Unity using x86_64/arm64 (Rosetta) on Apple Silicon hardware.
+    CMAKE_VARS=
+    if [[ "$(uname -a)" == *"arm64"* ]]; then
+        echo "Building for MacOS (arm64)"
+        CMAKE_VARS="-DCMAKE_APPLE_SILICON_PROCESSOR=arm64 -DCMAKE_POLICY_VERSION_MINIMUM=3.10"
+    else
+      echo "Building for MacOS (x86_64)"
+        CMAKE_VARS="-DCMAKE_APPLE_SILICON_PROCESSOR=x86_64 -DCMAKE_POLICY_VERSION_MINIMUM=3.10"
+    fi
+
     # llvm@21 gives errors on build
     export CC="$(brew --prefix)/opt/llvm@18/bin/clang"
     export CXX="$(brew --prefix)/opt/llvm@18/bin/clang++"
-    cmake ../cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_APPLE_SILICON_PROCESSOR=arm64 -DCMAKE_POLICY_VERSION_MINIMUM=3.10
+    cmake ../cmake -DCMAKE_BUILD_TYPE=Release $CMAKE_VARS
     #CC=/usr/bin/clang CXX=/usr/bin/clang++ cmake ../cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_APPLE_SILICON_PROCESSOR=arm64
 else
     echo "Building for Linux"
