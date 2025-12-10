@@ -49,8 +49,7 @@ else #linux
         rsync \
         software-properties-common \
         wget \
-        libvulkan1 \
-        vulkan-utils
+        libvulkan1
 
     #install clang and build tools
     VERSION=$(lsb_release -rs | cut -d. -f1)
@@ -61,6 +60,13 @@ else #linux
         sudo apt-get update
     fi
     sudo apt-get install -y clang-12 clang++-12 libc++-12-dev libc++abi-12-dev
+
+
+    if [ "$VERSION" -gt "20" ]; then
+        sudo apt-get -y install --no-install-recommends vulkan-tools libunwind-dev
+    else
+        sudo apt-get -y install --no-install-recommends vulkan-utils
+    fi
 fi
 
 if ! which cmake; then
