@@ -51,7 +51,7 @@ def write_file(filename, bstr):
 
 # helper method for converting getOrientation to roll/pitch/yaw
 # https:#en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
-    
+
 def to_eularian_angles(q):
     z = q.z_val
     y = q.y_val
@@ -59,23 +59,24 @@ def to_eularian_angles(q):
     w = q.w_val
     ysqr = y * y
 
-    # roll (x-axis rotation)
-    t0 = +2.0 * (w*x + y*z)
-    t1 = +1.0 - 2.0*(x*x + ysqr)
-    roll = math.atan2(t0, t1)
-
     # pitch (y-axis rotation)
-    t2 = +2.0 * (w*y - z*x)
-    if (t2 > 1.0):
-        t2 = 1
-    if (t2 < -1.0):
-        t2 = -1.0
-    pitch = math.asin(t2)
-
-    # yaw (z-axis rotation)
-    t3 = +2.0 * (w*z + x*y)
-    t4 = +1.0 - 2.0 * (ysqr + z*z)
-    yaw = math.atan2(t3, t4)
+    test = +2.0 * (w*y - z*x)
+    #pitch near -90 or 90 need to be handled differently
+    if (abs(test) > 0.999999):
+        pitch = math.pi/2 * test
+        yaw = 2 * math.atan2(z,w) 
+        roll = 0
+    else:
+        #not sigularity
+        pitch = math.asin(test)
+        # roll (x-axis rotation)
+        t0 = +2.0 * (w*x + y*z)
+        t1 = +1.0 - 2.0*(x*x + ysqr)
+        roll = math.atan2(t0, t1)
+        # yaw (z-axis rotation)
+        t2 = +2.0 * (w*z + x*y)
+        t3 = +1.0 - 2.0 * (ysqr + z*z)
+        yaw = math.atan2(t2, t3)
 
     return (pitch, roll, yaw)
 
