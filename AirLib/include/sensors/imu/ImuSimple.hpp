@@ -43,6 +43,8 @@ namespace airlib
             ImuBase::update();
 
             updateOutput();
+
+            is_new_ = true;
         }
         //*** End: UpdatableState implementation ***//
 

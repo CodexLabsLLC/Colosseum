@@ -402,3 +402,12 @@ PythonClient/docs/_build
 
 # clangd generated folder, for e.g. from VSCode clangd extension
 .cache/
+
+# custom: ignore
+/AirLibUnitTests/data
+/AirLibUnitTests/figures
+/AirLibUnitTests/log.txt
+/AirLibUnitTests/data.csv
+/AirLibUnitTests/figure*.pdf
+/AirLibUnitTests/other.txt
+build_AirSimEkfPod/

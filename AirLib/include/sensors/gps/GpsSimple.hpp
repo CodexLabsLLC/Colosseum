@@ -38,6 +38,9 @@ namespace airlib
         //*** Start: UpdatableState implementation ***//
         virtual void resetImplementation() override
         {
+            gauss_dist_pos.reset();
+            gauss_dist_vel.reset();
+
             freq_limiter_.reset();
             delay_line_.reset();
 
@@ -61,8 +64,11 @@ namespace airlib
 
             delay_line_.update();
 
-            if (freq_limiter_.isWaitComplete())
+            if (freq_limiter_.isWaitComplete()) {
                 setOutput(delay_line_.getOutput());
+
+                is_new_ = true;
+            }
         }
 
         //*** End: UpdatableState implementation ***//
@@ -78,9 +84,21 @@ namespace airlib
             //GNSS
             output.gnss.time_utc = static_cast<uint64_t>(clock()->nowNanos() / 1.0E3);
             output.gnss.geo_point = ground_truth.environment->getState().geo_point;
+
+            // add Gaussian white noise to the ground truth gps position outputs
+            output.gnss.geo_point.longitude += gauss_dist_pos.next()[0] * params_.sigma_long;
+            output.gnss.geo_point.latitude += gauss_dist_pos.next()[1] * params_.sigma_lat;
+            output.gnss.geo_point.altitude += gauss_dist_pos.next()[2] * params_.sigma_alt;
+
             output.gnss.eph = eph;
             output.gnss.epv = epv;
+
+            // add Gaussian white noise to the ground truth gps position outputs
             output.gnss.velocity = ground_truth.kinematics->twist.linear;
+            output.gnss.velocity.x() += gauss_dist_vel.next()[0] * params_.sigma_vel_x;
+            output.gnss.velocity.y() += gauss_dist_vel.next()[1] * params_.sigma_vel_y;
+            output.gnss.velocity.z() += gauss_dist_vel.next()[2] * params_.sigma_vel_z;
+
             output.is_valid = true;
 
             output.gnss.fix_type =
@@ -101,6 +119,9 @@ namespace airlib
         FirstOrderFilter<real_T> eph_filter, epv_filter;
         FrequencyLimiter freq_limiter_;
         DelayLine<Output> delay_line_;
+
+        RandomVectorGaussianR gauss_dist_pos = RandomVectorGaussianR(0, 1);
+        RandomVectorGaussianR gauss_dist_vel = RandomVectorGaussianR(0, 1);
     };
 }
 } //namespace
