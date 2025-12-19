@@ -19,14 +19,7 @@ jobs:
       - name: Build AirLib
         run: ./build.sh
 
-      - name: Build ROS Wrapper
-        run: |
-          ./tools/install_ros_deps.sh
-          source /opt/ros/*/setup.bash
-          cd ros
-          catkin build -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12
-      
-      - name: Build ROS2 Wrapper
+      - name: Build ROS2 Jammy Wrapper
         if: matrix.os == 'ubuntu-22.04'
         run: |
           chmod +x ./tools/install_ros2_deps.sh
@@ -34,13 +27,12 @@ jobs:
           source /opt/ros/*/setup.bash
           cd ros2
           colcon build --cmake-args -DCMAKE_C_COMPILER=gcc-12 --cmake-args -DCMAKE_CXX_COMPILER=g++-12
-
-      # Removing support for GazeboDrone. Gazebo is dead. Long live AirSim/Colosseum.
-      # - name: Build GazeboDrone
-      #   run: |
-      #     sudo apt-get install -qq libgazebo9-dev gcc-12 g++-12
-      #     ./clean.sh && ./build.sh --gcc
-      #     cd GazeboDrone
-      #     mkdir build && cd build
-      #     cmake -DCMAKE_C_COMPILER=gcc-12 -DCMAKE_CXX_COMPILER=g++-12 ..
-      #     make
+      
+      - name: Build ROS2 Foxy Wrapper
+        if: matrix.os == 'ubuntu-24.04'
+        run: |
+          chmod +x ./tools/install_ros2_deps.sh
+          ./tools/install_ros2_deps.sh
+          source /opt/ros/*/setup.bash
+          cd ros2
+          colcon build --cmake-args -DCMAKE_C_COMPILER=gcc-12 --cmake-args -DCMAKE_CXX_COMPILER=g++-12
