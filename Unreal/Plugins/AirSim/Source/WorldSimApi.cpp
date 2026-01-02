@@ -790,7 +790,7 @@ bool WorldSimApi::testLineOfSightBetweenPoints(const msr::airlib::GeoPoint& lla1
                 color = FLinearColor{ 0, 1.0f, 0, 0.4f };
             }
 
-            simmode_->GetWorld()->PersistentLineBatcher->DrawLine(point1, point2, color, SDPG_World, 4, 999999);
+            simmode_->GetWorld()->GetLineBatcher(UWorld::ELineBatcherType::WorldPersistent)->DrawLine(point1, point2, color, SDPG_World, 4, 999999);
         }
     },
                                              true);
