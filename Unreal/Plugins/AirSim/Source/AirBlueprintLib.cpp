@@ -27,6 +27,10 @@
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "DetectionComponent.h"
 #include "CineCameraComponent.h"
+#include "AssetRegistry/AssetData.h"
+#include "RawIndexBuffer.h"
+#include "StaticMeshResources.h"
+#include "Engine/Blueprint.h"
 
 /*
 //TODO: change naming conventions to same as other files?

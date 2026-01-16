@@ -16,6 +16,7 @@
 #include "common/StateReporterWrapper.hpp"
 #include "LoadingScreenWidget.h"
 #include "UnrealImageCapture.h"
+#include "AssetRegistry/AssetData.h"
 #include "SimModeBase.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelLoaded);
