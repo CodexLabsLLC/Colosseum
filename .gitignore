@@ -402,3 +402,6 @@ PythonClient/docs/_build
 
 # clangd generated folder, for e.g. from VSCode clangd extension
 .cache/
+
+# User scripts
+PythonClient/_my_scripts/
