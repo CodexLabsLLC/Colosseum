@@ -51,7 +51,7 @@ EAppReturnType::Type UAirBlueprintLib::ShowMessage(EAppMsgType::Type message_typ
 
     return FMessageDialog::Open(message_type,
                                 FText::FromString(message.c_str()),
-                                title_text);
+                                &title_text);
 }
 
 void UAirBlueprintLib::enableWorldRendering(AActor* context, bool enable)

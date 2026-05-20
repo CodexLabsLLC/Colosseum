@@ -488,7 +488,19 @@ bool WorldSimApi::setObjectMaterialFromTexture(const std::string& object_name, c
                                                LogDebugLevel::Failure);
         }
         else {
-            UTexture2D* texture_desired = FImageUtils::ImportFileAsTexture2D(FString(texture_path.c_str()));
+            FString texture_fpath(texture_path.c_str());
+            UTexture2D* texture_desired = FImageUtils::ImportFileAsTexture2D(texture_fpath);
+            if (!texture_desired) {
+                UE_LOG(LogTemp, Error, TEXT("setObjectMaterialFromTexture: FAILED to load texture %s"), *texture_fpath);
+            }
+            else {
+                // Prevent garbage collection and force GPU upload
+                texture_desired->AddToRoot();
+                texture_desired->UpdateResource();
+                texture_desired->Filter = TF_Bilinear;
+                texture_desired->SRGB = true;
+                UE_LOG(LogTemp, Warning, TEXT("setObjectMaterialFromTexture: texture loaded %dx%d from %s"), texture_desired->GetSizeX(), texture_desired->GetSizeY(), *texture_fpath);
+            }
             AActor* actor = UAirBlueprintLib::FindActor<AActor>(simmode_, FString(object_name.c_str()));
 
             if (IsValid(actor)) {

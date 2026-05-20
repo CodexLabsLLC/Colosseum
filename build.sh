@@ -8,9 +8,9 @@ build_dir=build
 mkdir -p build
 cd build
 
-CC=/usr/bin/clang-18 CXX=/usr/bin/clang++-18 cmake ../cmake -DCMAKE_CXX_FLAGS='-stdlib=libc++ -I/usr/lib/llvm-17/include/c++/v1~'
+cmake ../cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5
 
-make -j$(nproc)
+make -j$(sysctl -n hw.ncpu)
 
 cd ..
 

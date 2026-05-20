@@ -92,7 +92,7 @@ public class AirSim : ModuleRules
         PublicIncludePaths.Add(Path.Combine(AirLibPath, "deps", "eigen3"));
         AddOSLibDependencies(Target);
 
-        SetupCompileMode(CompileMode.CppCompileWithRpc, Target);
+        SetupCompileMode(CompileMode.HeaderOnlyWithRpc, Target);
     }
 
     private void AddOSLibDependencies(ReadOnlyTargetRules Target)

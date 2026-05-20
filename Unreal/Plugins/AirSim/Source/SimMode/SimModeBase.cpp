@@ -448,6 +448,10 @@ void ASimModeBase::initializeCameraDirector(const FTransform& camera_transform, 
     TArray<AActor*> camera_dirs;
     UAirBlueprintLib::FindAllActor<ACameraManager>(this, camera_dirs);
     if (camera_dirs.Num() == 0) {
+        if (camera_director_class_ == nullptr) {
+            UE_LOG(LogTemp, Warning, TEXT("BP_CameraDirector not found, skipping camera director initialization"));
+            return;
+        }
         //create director
         FActorSpawnParameters camera_spawn_params;
         camera_spawn_params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
@@ -744,9 +748,10 @@ void ASimModeBase::setupVehiclesAndCamera()
     if (getApiProvider()->hasDefaultVehicle()) {
         //TODO: better handle no FPV vehicles scenario
         getVehicleSimApi()->possess();
-        CameraDirector->initializeForBeginPlay(getInitialViewMode(), getVehicleSimApi()->getPawn(), getVehicleSimApi()->getCamera("fpv"), getVehicleSimApi()->getCamera("back_center"), nullptr);
+        if (CameraDirector)
+            CameraDirector->initializeForBeginPlay(getInitialViewMode(), getVehicleSimApi()->getPawn(), getVehicleSimApi()->getCamera("fpv"), getVehicleSimApi()->getCamera("back_center"), nullptr);
     }
-    else
+    else if (CameraDirector)
         CameraDirector->initializeForBeginPlay(getInitialViewMode(), nullptr, nullptr, nullptr, nullptr);
 
     checkVehicleReady();
